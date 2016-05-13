@@ -2,115 +2,48 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Conway's Game of Life</title>
 </head>
 <body>
 
 </body>
+<script type="application/javascript" src="world.js"></script>
+<script type="application/javascript" src="grid.js"></script>
+<script type="application/javascript" src="gridRow.js"></script>
+<script type="application/javascript" src="cells.js"></script>
+<script type="application/javascript" src="neighbours.js"></script>
+<script type="application/javascript" src="rules.js"></script>
 <script type="application/javascript">
-    var lengthOfSide = 80;
+    var size = 80;
 
     function main() {
-        schedule(createInitialRandomWorld());
+        schedule(new World(size));
     }
 
     function schedule(world) {
         draw(world);
-
         function drawIteration() {
-            var newWorld = iterate(world);
-            console.dir(newWorld);
-            draw(newWorld);
-            world = newWorld;
-            window.setTimeout(drawIteration, 500);
+            world.iterate();
+            draw(world);
+
+            window.setTimeout(drawIteration, 100);
         }
 
-        window.setTimeout(drawIteration, 500);
+        window.setTimeout(drawIteration, 100);
     }
-
-    function createInitialRandomWorld(){
-        var world = [];
-        for(var y = 0; y < lengthOfSide; y++) {
-            world[y] = [];
-            for(var x = 0; x < lengthOfSide; x++) {
-                world[y][x] = Math.random() > 0.5;
-            }
-        }
-        return world;
+    function draw(world){
+        var buffer = new Buffer();
+        world.print(buffer);
+        buffer.draw();
     }
-
-    function getNumberOfAliveNeighbours(x, y, world) {
-        var neighbours = 0;
-        // y:x
-
-        // -1:-1, -1:0, -1:1
-        // 0:-1,      , 0:1
-        // 1:-1, 1:0, , 1:1
-
-
-        if (y > 0 && x > 0 && world[y - 1][x - 1]) {
-            neighbours++;
-        }
-        if (y > 0 && world[y - 1][x]) {
-            neighbours++;
-        }
-        if (y > 0 && x < (lengthOfSide-1) && world[y - 1][x + 1]) {
-            neighbours++;
-        }
-
-        if (x > 0 && world[y][x-1]) {
-            neighbours++;
-        }
-        if (x < (lengthOfSide-1) && world[y][x+1]) {
-            neighbours++;
-        }
-        if (y < (lengthOfSide-1) && x > 0 && world[y+1][x-1]) {
-            neighbours++;
-        }
-        if (y < (lengthOfSide-1) && world[y+1][x]) {
-            neighbours++;
-        }
-        if (y < (lengthOfSide-1) && x < (lengthOfSide-1) && world[y+1][x+1]) {
-            neighbours++;
-        }
-        return neighbours;
+    function Buffer(){
+        var data = "";
+        this.append = function (stringData){
+            data = data.concat(stringData);
+        };
+        this.draw = function () {
+            document.body.innerHTML = '<pre>'+data+'</pre>';
+        };
     }
-
-    function isCellAlive(isAlive, numberOfAliveNeighbours) {
-        if (numberOfAliveNeighbours < 2 ) return false;
-
-        if (numberOfAliveNeighbours === 3) return true;
-
-        if (numberOfAliveNeighbours > 3) return false;
-
-        if (isAlive && numberOfAliveNeighbours === 2) return true;
-    }
-    function iterate(previousWorld) {
-        var newWorld = [];
-        for(var y = 0; y < lengthOfSide; y++) {
-            newWorld[y] = [];
-            for(var x = 0; x < lengthOfSide; x++) {
-                var neighbourgs = getNumberOfAliveNeighbours(x, y, previousWorld);
-                newWorld[y][x] = isCellAlive(previousWorld[y][x], neighbourgs);
-            }
-        }
-        return newWorld;
-    }
-
-    function draw(world) {
-        var worldStr = "";
-        for(var y = 0; y < lengthOfSide; y++) {
-            for(var x = 0; x < lengthOfSide; x++) {
-                if(world[y][x]) {
-                    worldStr = worldStr + 'X';
-                } else {
-                    worldStr = worldStr + ' ';
-                }
-            }
-            worldStr = worldStr + '\n';
-        }
-        document.body.innerHTML = '<pre>'+worldStr+'</pre>';
-    }
-
 </script>
 </html>
