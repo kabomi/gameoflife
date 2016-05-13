@@ -17,6 +17,8 @@ module.exports = function(config) {
       'jasmine'
     ],
 
+    reporters: ['osx'],
+
     // list of files / patterns to load in the browser
     files: [
       'src/**/*.js',
